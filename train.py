@@ -72,10 +72,15 @@ class BigramLanguageModel(nn.Module):
     def generate(self, idx, max_new_tokens):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
-            logits, _ = self(idx)
+            # gets predictions
+            logits, loss = self(idx)
+            # focuses on last time step
             logits = logits[:, -1, :] # (B, C)
+            # softmax to get probabilities
             probs = F.softmax(logits, dim=-1)
+            # one sample from distribution
             idx_next = torch.multinomial(probs, num_samples=1) # (B, 1)
+            # append sampled index to running sequence
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         return idx
 
@@ -85,7 +90,10 @@ logits, loss = model(xb, yb)
 print(logits.shape)
 print(loss)
 
-"""
+# 1x1 tensor holding zero
+idx = model.generate(torch.zeros((1,1), dtype=torch.long, device=device), max_new_tokens=100)
+print(decode(idx[0].tolist()))
+
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
 for iter in range(max_iters):
@@ -99,6 +107,8 @@ for iter in range(max_iters):
     loss.backward()
     optimizer.step()
 
+    print(loss.item())
+
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
 print(decode(model.generate(context, max_new_tokens=500)[0].tolist()))
-"""
+
