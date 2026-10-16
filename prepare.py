@@ -4,7 +4,7 @@ import requests
 import numpy as np
 import torch
 
-with open("data/tinyshakespeare.txt", 'r', encoding='utf-8') as f:
+with open("data/breakingbad/test.txt", 'r', encoding='utf-8') as f:
     data = f.read()
 
 #print(len(text))
@@ -34,6 +34,6 @@ print(f"test has {len(test_ids):,} tokens")
 train_ids = np.array(train_ids, dtype=np.uint16)
 test_ids = np.array(test_ids, dtype=np.uint16)
 
-train_ids.tofile(os.path.join(os.path.dirname(__file__), 'data', 'train.bin'))
-test_ids.tofile(os.path.join(os.path.dirname(__file__), 'data', 'test.bin'))
+train_ids.tofile(os.path.join(os.path.dirname(__file__), 'data', 'bb_train.bin'))
+test_ids.tofile(os.path.join(os.path.dirname(__file__), 'data', 'bb_test.bin'))
 

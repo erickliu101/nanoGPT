@@ -7,7 +7,7 @@ from torch.nn import functional as F
 # hyperparameters
 batch_size = 32
 block_size = 8
-max_iters = 5000
+max_iters = 10000
 eval_interval = 500
 eval_iters = 200
 learning_rate = 1e-3 # self-attention can't tolerate very high learning rates
@@ -15,7 +15,7 @@ n_embd = 32
 device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 torch.manual_seed(1337)
 
-with open("data/tinyshakespeare.txt", 'r', encoding='utf-8') as f:
+with open("data/breakingbad/test.txt", 'r', encoding='utf-8') as f:
     text = f.read()
 chars = sorted(list(set(text)))
 vocab_size = len(chars)
@@ -25,8 +25,8 @@ def decode(l):
 
 # tokenized data from prepare.py
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
-train_data = torch.from_numpy(np.fromfile(os.path.join(data_dir, 'train.bin'), dtype=np.uint16).astype(np.int64))
-test_data = torch.from_numpy(np.fromfile(os.path.join(data_dir, 'test.bin'), dtype=np.uint16).astype(np.int64))
+train_data = torch.from_numpy(np.fromfile(os.path.join(data_dir, 'bb_train.bin'), dtype=np.uint16).astype(np.int64))
+test_data = torch.from_numpy(np.fromfile(os.path.join(data_dir, 'bb_test.bin'), dtype=np.uint16).astype(np.int64))
 
 def get_batch(split):
     data = train_data if split == 'train' else test_data
@@ -143,7 +143,8 @@ for iter in range(max_iters):
     loss.backward()
     optimizer.step()
 
-    print(loss.item())
+    # print(loss.item())
+    print (iter, "/", max_iters)
 
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
 print(decode(model.generate(context, max_new_tokens=500)[0].tolist()))
